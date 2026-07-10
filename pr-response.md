@@ -10,7 +10,7 @@ The final arguments and the position taken are my own; the AI was used to stress
 
 **Other AI uses during the project:**
 - **Codebase orientation.** I asked the AI to summarize `models.py`, `services/collection_service.py`, and `tests/test_collection.py` (responsibilities, key functions, dependencies) before reading them in detail, then verified each summary against the actual source. In particular I had it walk through `add_to_collection()` step-by-step — what the dedup check does and that it *raises* (never returns a duplicate) — which is the pattern I then reimplemented myself for Comment 2.
-- **Commit-format verification.** Before finalizing, I gave my `git log --oneline` to the AI and asked whether every message follows Conventional Commits and whether any commit bundles multiple logical changes. It confirmed all eight prefixes are valid (`feat`/`fix`/`refactor`/`test`/`docs`) and each commit is a single logical change; I then re-checked the output myself against the Conventional Commits spec.
+- **Commit-format verification.** Before finalizing, I gave my `git log --oneline` to the AI and asked whether every message follows Conventional Commits and whether any commit bundles multiple logical changes. It confirmed all ten prefixes are valid (`feat`/`fix`/`refactor`/`test`/`docs`) and each commit is a single logical change; I then re-checked the output myself against the Conventional Commits spec.
 - **A caught bug.** While verifying the Comment 5 sort change, a manual check surfaced that `get_watchlist()`'s `entry.film` access had never worked (`WatchlistEntry` had no `film` relationship) — a pre-existing bug I confirmed against the original code and fixed while restoring the model during the Comment 6 rebase.
 
 ## Comment 1 — Rename
@@ -69,20 +69,9 @@ The final arguments and the position taken are my own; the AI was used to stress
 
 Rewrote the branch into clean, Conventional-Commits messages, each one logical change, linear on `main`, no merge commits (two `fix:` commits at the top were added afterward to resolve major errors — see "Post-review fixes" below):
 
-```
-fix:      avoid duplicate SQLAlchemy instance when run as __main__
-fix:      map watchlist add errors to 404 and 409
-docs:     add PR response doc for the watchlist review
-fix:      port watchlist to UUID film IDs after rebase onto main
-refactor: sort watchlist by date added (newest first)
-test:     add nonexistent-film test for add_to_watchlist
-feat:     prevent duplicate entries in add_to_watchlist
-refactor: rename save_to_watchlist to add_to_watchlist
-fix:      use db.session.get for film lookups
-feat:     add watchlist endpoints and service
-```
+![git log --oneline main..feature/watchlist](docs/git-log.png)
 
-> Commit hashes are omitted here because they change on every rebase/amend. **For submission, run `git log --oneline` in the terminal and screenshot the live output** (it shows the same eight subjects on top of the `main` tip).
+The screenshot above is scoped to `main..feature/watchlist` so it shows exactly the ten commits this branch adds, with **no merge commits** — confirming the branch was rebased (not merged) onto `main`. (The three commits below `a3e62ed` — including the `bbe206c` merge of PR #2 — belong to the upstream starter's `main` and are not part of this branch's work; scoping the log to `main..` excludes them.)
 
 ---
 
