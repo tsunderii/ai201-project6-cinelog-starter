@@ -35,5 +35,11 @@ def create_app(config=None):
 
 
 if __name__ == "__main__":
-    app = create_app()
-    app.run(debug=True)
+    # Import create_app from the module (not this __main__ copy) so the running
+    # app shares the single `db` instance that models.py binds to. Running the
+    # file directly otherwise creates a second, uninitialized SQLAlchemy
+    # instance and every DB query fails with "not registered with this
+    # 'SQLAlchemy' instance".
+    from app import create_app
+
+    create_app().run(debug=True)
