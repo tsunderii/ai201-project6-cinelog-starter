@@ -22,9 +22,11 @@ def create_app(config=None):
 
     from routes.films import films_bp
     from routes.collection import collection_bp
+    from routes.watchlist.watchlist import watchlist_bp
 
     app.register_blueprint(films_bp, url_prefix="/films")
     app.register_blueprint(collection_bp, url_prefix="/collection")
+    app.register_blueprint(watchlist_bp, url_prefix="/watchlist")
 
     with app.app_context():
         db.create_all()
@@ -33,5 +35,11 @@ def create_app(config=None):
 
 
 if __name__ == "__main__":
-    app = create_app()
-    app.run(debug=True)
+    # Import create_app from the module (not this __main__ copy) so the running
+    # app shares the single `db` instance that models.py binds to. Running the
+    # file directly otherwise creates a second, uninitialized SQLAlchemy
+    # instance and every DB query fails with "not registered with this
+    # 'SQLAlchemy' instance".
+    from app import create_app
+
+    create_app().run(debug=True)
